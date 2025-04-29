@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSTV Decoder</title>
+    <!-- Bootstrap CSS (Replit dark theme) -->
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-broadcast-tower me-2"></i>
+                SSTV Decoder
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow mb-4">
+                    <div class="card-header">
+                        <h4><i class="fas fa-upload me-2"></i> Upload WAV File</h4>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Upload a WAV file containing SSTV signals to decode into an image.</p>
+                        
+                        <form id="upload-form" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="file-upload" class="form-label">Select WAV file:</label>
+                                <input type="file" class="form-control" id="file-upload" name="file" accept=".wav" required>
+                                <div class="form-text">Only WAV files are supported.</div>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary" id="upload-button">
+                                    <i class="fas fa-satellite-dish me-2"></i> Decode SSTV Signal
+                                </button>
+                            </div>
+                            
+                            <div class="text-center mt-3">
+                                <div class="separator text-muted my-3">or</div>
+                                <button type="button" class="btn btn-outline-info" id="generate-test">
+                                    <i class="fas fa-magic me-2"></i> Generate & Decode Test Signal
+                                </button>
+                                <div class="form-text mt-2">Don't have an SSTV file? Click here to generate a test file.</div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Loading indicator -->
+                <div id="loading-container" class="card shadow mb-4 d-none">
+                    <div class="card-body text-center py-5">
+                        <div class="spinner-border text-primary mb-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <h5>Decoding SSTV Signal...</h5>
+                        <p class="text-muted">This may take a few moments depending on the file size.</p>
+                    </div>
+                </div>
+
+                <!-- Result display -->
+                <div id="result-container" class="card shadow mb-4 d-none">
+                    <div class="card-header">
+                        <h4><i class="fas fa-image me-2"></i> Decoded SSTV Image</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <img id="result-image" class="img-fluid rounded border" alt="Decoded SSTV Image">
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">SSTV Mode</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p id="sstv-mode" class="card-text fw-bold"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Processing Time</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p id="processing-time" class="card-text fw-bold"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Alternative methods section -->
+                        <div id="alt-methods-container" class="mt-4 d-none">
+                            <h5><i class="fas fa-code-branch me-2"></i> Alternative Decoding Results</h5>
+                            <p class="text-muted small">Our decoder tried multiple methods to get the best image. Try these alternatives if the primary result is not satisfactory.</p>
+                            <div id="alt-methods" class="row g-3">
+                                <!-- Alt methods will be added here dynamically -->
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <a id="download-link" class="btn btn-success" download>
+                                <i class="fas fa-download me-2"></i> Download Image
+                            </a>
+                            <button id="decode-another" class="btn btn-secondary">
+                                <i class="fas fa-redo me-2"></i> Decode Another File
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error display -->
+                <div id="error-container" class="card shadow mb-4 d-none">
+                    <div class="card-header bg-danger text-white">
+                        <h4><i class="fas fa-exclamation-triangle me-2"></i> Error</h4>
+                    </div>
+                    <div class="card-body">
+                        <p id="error-message" class="card-text"></p>
+                        <div class="d-grid gap-2 mt-3">
+                            <button id="try-again" class="btn btn-outline-danger">
+                                <i class="fas fa-redo me-2"></i> Try Again
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card shadow mb-4">
+                    <div class="card-header">
+                        <h4><i class="fas fa-info-circle me-2"></i> About SSTV</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>Slow Scan Television (SSTV) is a method used for image transmission, primarily by amateur radio operators.</p>
+                        <h5>Supported Modes:</h5>
+                        <ul>
+                            <li><strong>Scottie</strong> (S1, S2, DX)</li>
+                            <li><strong>Martin</strong> (M1, M2)</li>
+                            <li><strong>Robot</strong> (36, 72)</li>
+                        </ul>
+                        <h5>Tips:</h5>
+                        <ul>
+                            <li>Use a clean audio signal for best results</li>
+                            <li>Typical SSTV transmission lasts 2-3 minutes</li>
+                            <li>Make sure your WAV file has proper sync pulses</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="py-4 mt-4 bg-dark">
+        <div class="container text-center">
+            <p class="mb-0 text-muted">SSTV Decoder | A tool for decoding SSTV signals from WAV files</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

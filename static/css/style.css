@@ -1,0 +1,66 @@
+/* Custom styles to complement Bootstrap */
+
+/* Make the image display area have a consistent height */
+#result-image {
+    max-height: 400px;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    background-color: var(--bs-dark);
+}
+
+/* Custom styling for the file input */
+input[type="file"] {
+    padding: 10px;
+    cursor: pointer;
+}
+
+/* Card hover effect */
+.card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Loading spinner customization */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Add some margin to the bottom of the page */
+body {
+    margin-bottom: 40px;
+}
+
+/* Separator with text */
+.separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+}
+
+.separator::before,
+.separator::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--bs-gray-600);
+}
+
+.separator::before {
+    margin-right: .5em;
+}
+
+.separator::after {
+    margin-left: .5em;
+}
+
+/* Media queries for responsive design */
+@media (max-width: 768px) {
+    #result-image {
+        max-height: 300px;
+    }
+}
